@@ -11,6 +11,10 @@ body {
   background: #fff;
   color: black;
   padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
 .number-box {
@@ -21,7 +25,9 @@ body {
   align-items: center;
   text-align: center;
   margin-top: 10px;
+  margin-right: 5px;
   border-radius: 5px;
+  color: black;
   background-color: white;
 }
 
@@ -37,35 +43,28 @@ h2 {
   margin-right: 5px;
   overflow-y: auto;
   border-radius: 5px;
-  background-color: #b9d9eb;
+  background-color: #1a1423;
+  color: #eacdc2;
   font-family: "Trebuchet MS", sans-serif;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 .queue-box {
   padding: 10px;
-  width: 100vh;
+  width: 450px;
   height: 145px;
   margin-top: 1px;
   margin-bottom: 5px;
   border-radius: 5px;
+  color: #1a1423;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
-  background-color: #dffffd;
+  background-color: #eacdc2;
 }
 
 .center-button {
   margin: 10px;
 }
 
-.queue-progress {
-  height: 20px;
-  background-color: lightgray;
-  margin-top: 5px;
-  position: relative;
-}
-
-.queue-progress-fill {
-  height: 100%;
-  background-color: green;
-  transition: width 0.1s ease-in;
+.progress-bar-fill {
+  background-color: #b75d69 !important;
 }
