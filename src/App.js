@@ -10,17 +10,12 @@ function App() {
   const [queue, setQueue] = useState([[], [], [], []]);
   const [countdown, setCountdown] = useState([false, false, false, false]);
 
-  // Getting of task number
+  // Generating of the task number
   const getNumber = (min, max) => {
     min = Math.ceil(min);
     max = Math.floor(max);
 
-    // Generates a random number with in the min-max range
     const num = Math.floor(Math.random() * (max - min + 1)) + min;
-
-    // Generates a boolean value of "high priority" to a number with 20% chance.
-    // True -> High priority
-    // False -> Regular priority
     const highPriority = Math.random() < 0.2;
 
     // Creates an object with 3 properties: the number itself, the duration
@@ -32,7 +27,7 @@ function App() {
     };
 
     // Updates generatedNumber with the function taking
-    // the prev value. It adds a new number object to an existing list
+    // the prev value (if it exists). It adds a new number object to an existing list
     setGeneratedNumber((previousNum) => [...previousNum, newNum]);
   };
 
@@ -47,10 +42,14 @@ function App() {
       let updatedQueue = [...queue];
       let updatedCountdown = [...countdown];
 
-      if (generatedNum.highPriority) {
+      if (generatedNum.highPriority) { 
+        //If high priority, it gets added in the first queue 
+        //regardless of the duration
         updatedQueue[0].push(generatedNum);
         updatedCountdown[0] = true;
       } else {
+        //Creates a new array with the regular queues
+        //Calculates the total duration for each queue
         const queueDurations = queue
           .slice(1, 4)
           .map((queueNumbers) =>
@@ -60,38 +59,56 @@ function App() {
             )
           );
 
+        //Takes the index of the queue with the least total duration
         let shortestQueueIndex = queueDurations.indexOf(
           Math.min(...queueDurations)
         );
 
+        //Sorts the number to the queue with the least duration
         updatedQueue[shortestQueueIndex + 1].push(generatedNum);
+
+        //Sets the queue with the tasks needed to be processed
+        //True means the queue has tasks, false means empty
         updatedCountdown[shortestQueueIndex + 1] = true;
       }
 
+      //Removes the number from the "Task Queue" after admission
       updatedGeneratedNumber = updatedGeneratedNumber.slice(1);
 
+      //Updates the respective variables
       setQueue(updatedQueue);
       setCountdown(updatedCountdown);
       setGeneratedNumber(updatedGeneratedNumber);
     }
   };
 
+  
+  //Responsible for updating the duration of tasks in the queues
   const numberDuration = () => {
+    //Copies the arrays of queue and countdown for modification
+    //without affecting the original
     let updatedQueue = [...queue];
     let updatedCountdown = [...countdown];
 
     for (let queueIndex = 0; queueIndex < queue.length; queueIndex++) {
+      //Checks the queue through two conditions:
+      //1) If queue is active and currently processing
+      //2) If queue is empty or not
       if (countdown[queueIndex] && queue[queueIndex].length > 0) {
+        //Takes the first number
         const firstNumber = queue[queueIndex][0];
 
+        //Decreases the duration
         if (firstNumber.duration > 0) {
           firstNumber.duration--;
         }
 
+        //Remove first item in array when duration runs out
         if (firstNumber.duration === 0) {
           updatedQueue[queueIndex].shift();
         }
 
+        //Update the state if empty or not
         if (updatedQueue[queueIndex].length === 0) {
           updatedCountdown[queueIndex] = false;
         } else {
@@ -100,16 +117,23 @@ function App() {
       }
     }
 
+    //Update the arrays after processing
     setQueue(updatedQueue);
     setCountdown(updatedCountdown);
   };
 
   useEffect(() => {
+    //Calls the numberDuration func every 50 milliseconds
+    //when countdown changes
     const interval = setInterval(numberDuration, 50);
+
+    //Clears interval when countdown changes 
+    //(prevention of memory leaks)
     return () => clearInterval(interval);
   }, [countdown]);
 
   useEffect(() => {
+    //If all queues are empty, set the state to false for all queues.
     if (queue.every((queueNumbers) => queueNumbers.length === 0)) {
       setCountdown([false, false, false, false]);
     }
@@ -121,18 +145,26 @@ function App() {
         <h2>Task Queue</h2>
         <div className="center-button">
           <ButtonGroup
-            variant="contained"
-            aria-label="outlined primary button group"
-          >
-            <Button variant="contained" onClick={() => getNumber(1, 200)}>
+            variant="outlined"
+            aria-label="medium secondary button group">
+            <Button 
+              variant="contained" 
+              style={{ 
+                color: "#1a1423",
+                fontWeight: "bold",
+                backgroundColor: "#eacdc2"}}
+              onClick={() => getNumber(1, 100)}>
               Get Task
             </Button>
+
             <Button
-              variant="outlined"
-              style={{ backgroundColor: "white" }}
-              onClick={admitNumberToQueue}
-            >
-              Admit Number
+              variant="contained"
+              style={{ 
+                color: "#1a1423",
+                fontWeight: "bold",
+                backgroundColor: "white"}}
+              onClick={admitNumberToQueue}>
+              Admit Task
             </Button>
           </ButtonGroup>
         </div>
@@ -155,6 +187,9 @@ function App() {
       </div>
 
       <Container fixed>
+        {/* Iterate over the queue array.If it's the first queue, 
+        it is labeled as the (high) Priority Queue. If not,
+        it is a Regular Queue {x} */}
         {queue.map((queueNumbers, queueIndex) => (
           <div className="queue-box" key={queueIndex}>
             <h3>
@@ -162,6 +197,9 @@ function App() {
                 ? "Priority Queue"
                 : `Regular Queue ${queueIndex}`}
             </h3>
+            {/* Value is calculated based on the total duration
+            of tasks and dividing it by 1000 to convert into seconds
+            then to percentage. */}
             <LinearProgress
               style={{
                 backgroundColor: "white",
@@ -184,6 +222,9 @@ function App() {
             />
 
             <div>
+              {/* Iterate over the numbers objects in the
+              queue. Display the individual tasks (numbers)
+              in each queue */}
               {queueNumbers.map((numberObj, index) => (
                 <div
                   key={index}

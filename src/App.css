@@ -63,6 +63,9 @@ h2 {
 
 .center-button {
   margin: 10px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
 .progress-bar-fill {
